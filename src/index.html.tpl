@@ -9,13 +9,33 @@
 <body>
     <div id="main-map"></div>
 
-    <div class="side-panel container">
-        <h1>Fabulous Events</h1>
+    <div class="side-panel">
+        <div class="side-panel-text">
+            <h1>Fabulous Events</h1>
+        </div>
+    </div>   
 
-        <p>Feel free to create a new Event</p>
+    <div class="events-caption">
+        <div class="side-panel-info-title">
+            <h5>Events Caption</h5>
+        </div>
+        <div class="side-panel-caption">
+            <div class="side-panel-info">
+                <i class="fa-solid fa-location-dot"></i>
+                <p>Événement dans plus de 3 jours</p>
+            </div>
+            <div class="side-panel-info">
+                <i class="fa-solid fa-location-dot"></i>
+                <p>Événement dans 3 jours ou moins</p>
+            </div>           
+            <div class="side-panel-info">
+                <i class="fa-solid fa-location-dot"></i>
+                <p>Événement dépassé</p>
+            </div>
 
-
-    </div>    
+        </div>
+    </div> 
+    
 
 </body>
 </html>

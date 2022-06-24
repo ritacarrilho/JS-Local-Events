@@ -9,7 +9,6 @@ import mapboxgl, { Popup } from 'mapbox-gl';
 
 import '../../assets/styles/reset.css';
 import '../../assets/styles/style.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { DummyControl } from './Mapbox/Control/DummyControl';
 
 const STORAGE_KEY = 'local-events';
