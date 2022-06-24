@@ -1,6 +1,7 @@
 import config from '../../app.config';
 import { LocalStorageService } from './Service/LocalStorageService';
 import { Form } from './Entity/Form';
+import { LocalEvent } from './Entity/LocalEvent'
 
 
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -11,53 +12,64 @@ import '../../assets/styles/style.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { DummyControl } from './Mapbox/Control/DummyControl';
 
+const STORAGE_KEY = 'Local Events';
+
 class App {
     // currentGeoLocation = {
     //     lat: 0,
     //     lon: 0
     // }; 
     
+    evtStorage = null;
+    arrEvt = [];
+
     form = null;
     mainMap = null;
-
-    lonInput;
-    latInput;
+    locEvent = null;
 
     lat;
     long;
+    submitBtn;
 
     constructor() {
-
         mapboxgl.accessToken = config.mapbox.token; // api token
-        this.form = new Form(); 
+        this.form = new Form();
+
+        this.evtStorage = new LocalStorageService( STORAGE_KEY );
+
+        // MAP initialize
+        this.mainMap = new mapboxgl.Map({
+            container: 'main-map',
+            style: 'mapbox://styles/mapbox/dark-v10',
+        });
+
+        // Local Event initialize
+        // this.locEvent = new LocalEvent();
     }
 
     /**
      * Start App
      */
     start() {
+
         console.info('App started');
-    // FORM initialize
+    // initialize form DOM
         this.form.getForm();
-        
-    // MAP initialize
-        this.mainMap = new mapboxgl.Map({
-            container: 'main-map',
-            style: 'mapbox://styles/mapbox/dark-v10',
-        });
+
+    //     this.mainMap = new mapboxgl.Map({
+    //         container: 'main-map',
+    //         style: 'mapbox://styles/mapbox/dark-v10',
+    //     });
+
     // get inputs from form
-        this.lonInput = document.querySelector('#lon');
-        this.latInput = document.querySelector('#lat');
 
     // Set event listener - find coordinates from click and put it in input value
         this.mainMap.on('click', (e) => {
-            // console.log(`A click event has occurred at ${e.lngLat}`);
             console.log(e);
             // console.log(this.latInput);
             // console.log(this.lonInput);
-
-            this.lonInput.value = e.lngLat.lat;
-            this.latInput.value = e.lngLat.lng;
+            this.form.lat.value = e.lngLat.lat;
+            this.form.lon.value = e.lngLat.lng;
         });
 
         // add navigation controls (zoom, inclinaison, etc)
@@ -74,7 +86,6 @@ class App {
                 enableHighAccuracy: true,
                 showUserHeading: true,
             },
-
         });
 
         // Refresh button
@@ -115,7 +126,7 @@ class App {
         // Popup
         const popUp = new mapboxgl.Popup();
         // PopUp html 
-        popUp.setHTML('<h2>Pop-up title!</h2><p>This is the pop up content</p>');
+        // popUp.setHTML(this.locEvent.render());
         // set popup coordinates (equal to marker)
         markerWPop.setPopup(popUp);
         // add marker with popup to map
@@ -124,7 +135,18 @@ class App {
         // get marker
         const markerPointerDiv = marker.getElement();
         // set marker title
-        markerPointerDiv.title = 'Hello friend!';
+        // markerPointerDiv.title = `${this.locEvent.title}`;
+
+        this.submitBtn = document.querySelector('#submit');
+        this.submitBtn.addEventListener('click', this.handlerCreateLocEvt.bind(this));
+
+        let itemStorage = this.evtStorage.getJSON();
+
+        // Si le stockage n'est pas encore crée on ne pass à la suite
+        if( itemStorage === null ) return;
+
+        for( let eventJSON of itemStorage ) this.arrEvt.push( new LocalEvent( eventJSON ) );
+        
     }
 
     /**
@@ -132,35 +154,34 @@ class App {
      * @param data {Object}
      */
     render(data) {
-        console.info(data);
-        const
-            current = data.current,
-            weather = current.weather[0];
-        /*
-        "current": {
-            "dt": 1655468313,
-            "sunrise": 1655438752,
-            "sunset": 1655494577,
-            "temp": 30.62,
-            "feels_like": 29.27,
-            "pressure": 1023,
-            "humidity": 29,
-            "dew_point": 10.57,
-            "uvi": 9.62,
-            "clouds": 35,
-            "visibility": 10000,
-            "wind_speed": 1.54,
-            "wind_deg": 0,
-            "weather": [
-                {
-                    "id": 802,
-                    "main": "Clouds",
-                    "description": "scattered clouds",
-                    "icon": "03d"
-                }
-            ]
-        }
-         */
+
+    }
+
+    handlerCreateLocEvt(evt) {
+        // console.log(this.form);
+        evt.preventDefault();
+        // console.log(evt)
+
+        // Traitement des données
+        const newEvt = {};
+
+        // console.log(formtitle.value);
+        // console.log(this.form.title.value);
+        newEvt.title = this.form.title.value;
+        newEvt.description = this.form.description.value;
+        newEvt.beginDate = this.form.beginDate.value;
+        newEvt.endDate = this.form.endDate.value;
+        newEvt.lat = this.form.lat.value;
+        newEvt.lon = this.form.lon.value;
+
+        // Enregistrement
+
+        this.arrEvt.push( new LocalEvent( newEvt ) );
+        // console.log(newEvt),
+        console.log(this.arrEvt);
+ 
+         // Persistance des données
+        //  this.notesStorage.setJSON( this.arrNotas );
     }
 }
 
