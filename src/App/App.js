@@ -12,14 +12,9 @@ import '../../assets/styles/style.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { DummyControl } from './Mapbox/Control/DummyControl';
 
-const STORAGE_KEY = 'Local Events';
+const STORAGE_KEY = 'local-events';
 
 class App {
-    // currentGeoLocation = {
-    //     lat: 0,
-    //     lon: 0
-    // }; 
-    
     evtStorage = null;
     arrEvt = [];
 
@@ -51,17 +46,9 @@ class App {
      * Start App
      */
     start() {
-
-        console.info('App started');
+        // console.info('App started');
     // initialize form DOM
         this.form.getForm();
-
-    //     this.mainMap = new mapboxgl.Map({
-    //         container: 'main-map',
-    //         style: 'mapbox://styles/mapbox/dark-v10',
-    //     });
-
-    // get inputs from form
 
     // Set event listener - find coordinates from click and put it in input value
         this.mainMap.on('click', (e) => {
@@ -145,6 +132,7 @@ class App {
         // Si le stockage n'est pas encore crée on ne pass à la suite
         if( itemStorage === null ) return;
 
+        // store
         for( let eventJSON of itemStorage ) this.arrEvt.push( new LocalEvent( eventJSON ) );
         
     }
@@ -174,14 +162,15 @@ class App {
         newEvt.lat = this.form.lat.value;
         newEvt.lon = this.form.lon.value;
 
-        // Enregistrement
-
+        // add new event obj into array of Local Events
         this.arrEvt.push( new LocalEvent( newEvt ) );
-        // console.log(newEvt),
+        console.log(newEvt);
         console.log(this.arrEvt);
  
          // Persistance des données
-        //  this.notesStorage.setJSON( this.arrNotas );
+         this.evtStorage.setJSON( this.arrEvt );
+
+        //TODO: call clear method from Form class
     }
 }
 
