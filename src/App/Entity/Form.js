@@ -63,7 +63,7 @@ export class Form {
             </div>
             <div class="form-group mb-2">
               <label for="description">Description</label>
-              <textarea class="form-control" id="description" rows="3"></textarea>
+              <textarea class="form-control" id="description" rows="5"></textarea>
             </div>
             <div class="form-group mb-2">
               <label for="begin-date">Begin Date</label>
@@ -97,6 +97,12 @@ export class Form {
             // console.log(sidePanel);
     }
 
-    //TODO: clear all inputs after submiting a new event
-    clearInputs() {}
+    clearInputs() {
+      this.title.value = '';
+      this.description.value = '';
+      this.beginDate.value = '';
+      this.endDate.value = '';
+      this.lat.value = '';
+      this.lon.value = '';
+    }
 }

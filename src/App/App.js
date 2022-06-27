@@ -1,7 +1,8 @@
 import config from '../../app.config';
 import { LocalStorageService } from './Service/LocalStorageService';
 import { Form } from './Entity/Form';
-import { LocalEvent } from './Entity/LocalEvent'
+import { LocalEvent } from './Entity/LocalEvent';
+// import { Map } from './Entity/Map';
 
 
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -27,9 +28,12 @@ class App {
 
     constructor() {
         mapboxgl.accessToken = config.mapbox.token; // api token
-        this.form = new Form();
 
+        this.form = new Form();
         this.evtStorage = new LocalStorageService( STORAGE_KEY );
+
+        // this.mainMap = new Map(); 
+        //TODO: make Map class
 
         // MAP initialize
         this.mainMap = new mapboxgl.Map({
@@ -45,9 +49,9 @@ class App {
      * Start App
      */
     start() {
-        // console.info('App started');
     // initialize form DOM
         this.form.getForm();
+        // this.mainMap.start();
 
     // Set event listener - find coordinates from click and put it in input value
         this.mainMap.on('click', (e) => {
@@ -58,11 +62,11 @@ class App {
             this.form.lon.value = e.lngLat.lng;
         });
 
-        // add navigation controls (zoom, inclinaison, etc)
+    // add navigation controls (zoom, inclinaison, etc)
         const navControl = new mapboxgl.NavigationControl( {visualizePitch: true} );
         this.mainMap.addControl(navControl, 'bottom-right');
     
-        // add geolocation control
+    // add geolocation control
         const geoControl = new mapboxgl.GeolocateControl({
             fitBoundsOptions: {
                 zoom: 17.5,
@@ -84,57 +88,47 @@ class App {
         const dummyControl = new DummyControl();
         this.mainMap.addControl(dummyControl, 'top-right');
 
-        // add pin without popup, title only
-        const marker = new mapboxgl.Marker({
-            color: '#fc0'
-        });
-        // set marker coordinates
-        marker.setLngLat({
-            lon: 3.454649789,
-            lat: 43.4564897468
-        });
-
-        // add marker to map
-        marker.addTo(this.mainMap);
-        // set marker title when mouse hover 
-        const markerDiv = marker.getElement();
-        markerDiv.title = 'First Pin';
-
-        // add pin with popup
-        const markerWPop = new mapboxgl.Marker({
-            color: '#e1c'
-        });
-        // set marker coordinates
-        markerWPop.setLngLat({
-            lon: 2.8948,
-            lat: 42.6887
-        });
-        // Popup
-        const popUp = new mapboxgl.Popup();
-        // PopUp html 
-        // popUp.setHTML(this.locEvent.render());
-        // set popup coordinates (equal to marker)
-        markerWPop.setPopup(popUp);
-        // add marker with popup to map
-        markerWPop.addTo(this.mainMap);
-
-        // get marker
-        const markerPointerDiv = marker.getElement();
-        // set marker title
-        // markerPointerDiv.title = `${this.locEvent.title}`;
-
+        // Submit form event
         this.submitBtn = document.querySelector('#submit');
         this.submitBtn.addEventListener('click', this.handlerCreateLocEvt.bind(this));
 
+        // get data from local storage
         let itemStorage = this.evtStorage.getJSON();
 
         // Si le stockage n'est pas encore crée on ne pass à la suite
         if( itemStorage === null ) return;
 
-        // store
+        // store each local event into local storage
         for( let eventJSON of itemStorage ) this.arrEvt.push( new LocalEvent( eventJSON ) );
-        
+
+    // MARKERS
+        this.arrEvt.forEach(locEvt => {
+        // Popup
+        const popUp = new mapboxgl.Popup();
+        // PopUp html 
+        popUp.setHTML(this.popUpRender(locEvt));
+
+        // add pin 
+        const marker = new mapboxgl.Marker({
+            color: '#fc0'
+        }).setLngLat({
+                lon: locEvt.lon,
+                lat: locEvt.lat,
+            }).setPopup(popUp)
+                .addTo(this.mainMap);
+        });
+
+        // const markerTitle = marker.getElement();
+        // markerTitle.title = 'First Pin';
+
+        // all form inputs
+        let formEls = [ this.form.title, this.form.description, this.form.beginDate, this.form.endDate, this.form.lat, this.form.lon ];
+        //remove error class on click
+        formEls.forEach(element => {
+            element.addEventListener( 'click', this.handlerRemoveError.bind(this) );
+        });
     }
+
 
     /**
      * create HTML with data
@@ -145,15 +139,45 @@ class App {
     }
 
     handlerCreateLocEvt(evt) {
-        // console.log(this.form);
         evt.preventDefault();
-        // console.log(evt)
+        evt.addEventListener( 'change', this.form.lat.handlerRemoveError);
 
-        // Traitement des données
+        let regAlphaNum = new RegExp('^[A-Za-z0-9 ]+$'),
+            hasError = false;
+
+        // Errors control
+        if( !regAlphaNum.test( this.form.title.value ) ) {
+            hasError = true;
+            this.form.title.value  = '';
+            this.form.title.classList.add( 'error' );
+        }
+
+        if( this.form.description.value == '' ||     
+            this.form.beginDate.value == '' ||
+            this.form.endDate.value == '' ||
+            this.form.lat.value == '' ||
+            this.form.lon.value == '') 
+        {
+            hasError = true;
+            this.form.description.value,     
+            this.form.beginDate.value,
+            this.form.endDate.value,
+            this.form.lat.value,
+            this.form.lon.value = '';
+
+            this.form.description.classList.add( 'error' );
+            this.form.beginDate.classList.add( 'error' );
+            this.form.endDate.classList.add( 'error' );
+            this.form.lat.classList.add( 'error' );
+            this.form.lon.classList.add( 'error' );
+        }
+
+        //TODO: send error message(try, catch)
+        if( hasError ) return;
+        
+        // Data treatment
         const newEvt = {};
 
-        // console.log(formtitle.value);
-        // console.log(this.form.title.value);
         newEvt.title = this.form.title.value;
         newEvt.description = this.form.description.value;
         newEvt.beginDate = this.form.beginDate.value;
@@ -163,15 +187,55 @@ class App {
 
         // add new event obj into array of Local Events
         this.arrEvt.push( new LocalEvent( newEvt ) );
-        console.log(newEvt);
         console.log(this.arrEvt);
  
-         // Persistance des données
-         this.evtStorage.setJSON( this.arrEvt );
+        // Persistance des données
+        this.evtStorage.setJSON( this.arrEvt );
 
-        //TODO: call clear method from Form class
+        //TODO: change alert for modal
+        // success message
+        alert(this.successMessage(newEvt.title));
+
+        // clean input values after form submition
+        this.form.clearInputs();
     }
+
+    // PopUp HTML template
+    popUpRender(localEvt) {
+        return `<h2>${localEvt.title}</h2>
+            <p><strong>Description: </strong>${localEvt.description}</p>
+            <p><strong>Begin Date: </strong>${localEvt.beginDate}</p>
+            <p><strong>End Date: </strong>${localEvt.endDate}</p>
+            <p><strong>Latitude: </strong>${localEvt.lat} lat</p>
+            <p><strong>Longitude: </strong>${localEvt.lon} lon</p>`;
+    }
+
+    markerColorHandler(eventDate) {
+        let today = Date.now();
+
+        if (eventDate ) {
+           
+        }
+    }
+
+    successMessage(title) {
+        const msg = `The local Event ${title} was successfully created !`;
+
+        return msg;
+    }
+
+    errorMessage() {
+        const msg = `Please fill all fields`;
+
+        return msg;
+    }
+    
+    handlerRemoveError( evt ) {
+        evt.target.classList.remove( 'error' );
+    }
+
 }
+
 
 const instance = new App();
 

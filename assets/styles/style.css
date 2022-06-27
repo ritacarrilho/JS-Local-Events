@@ -21,7 +21,9 @@ input, textarea {
     border: 1px solid var(--medium-grey);
     padding: 10px;
     border-radius: 10px;
-    font-weight: 400;
+    font-weight: 300;
+    font-family: var(--main-font);
+    font-size: 15px;
 }
 
 label {
@@ -104,7 +106,7 @@ body {
     left: 10px;
     top: 10px;
     text-align: center;
-    padding: 10px;
+    padding: 20px;
     box-shadow: 0 5px 15px var(--box-shadow);
     /* box-shadow: 0 0 2px rgb(0 0 0 / 20%), 0 -1px 0 rgb(0 0 0 / 2%); */
 }
@@ -148,4 +150,9 @@ body {
     display: flex;
     font-size: 20px;
     justify-content: center;
+}
+
+
+.error {
+    border-color: red;
 }
