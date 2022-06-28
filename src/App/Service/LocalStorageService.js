@@ -2,7 +2,7 @@
  * Browser's Local Storage managment 
  */
 export class LocalStorageService {
-    storageKey; // property to store local storage's key
+    storageKey;
 
     constructor(key) {
         this.storageKey = key;

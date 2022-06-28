@@ -1,13 +1,10 @@
-// import config from '../../app.config';
 import { LocalStorageService } from './Service/LocalStorageService';
 import { Form } from './Entity/Form';
 import { LocalEvent } from './Entity/LocalEvent';
 import { Map } from './Entity/Map';
-import { Marker } from './Entity/Marker';
-
 
 import 'mapbox-gl/dist/mapbox-gl.css';
-import mapboxgl, { Popup } from 'mapbox-gl';
+import mapboxgl from 'mapbox-gl';
 
 import '../../assets/styles/reset.css';
 import '../../assets/styles/style.css';
@@ -63,7 +60,6 @@ class App {
         this.formEls.forEach(element => {
             element.addEventListener( 'click', this.handlerRemoveError.bind(this) );
         });
-
     }
 
     /**
@@ -72,35 +68,35 @@ class App {
     getMarkers() {
         // get data from local storage
         let itemStorage = this.evtStorage.getJSON();
-
-        // Si le stockage n'est pas encore crée on ne pass à la suite
+        // If the local storage is not yet created, ends method execution
         if( itemStorage === null ) return;
+        // console.log(this.arrEvt);
 
-        // store each local event into local storage
-        for( let eventJSON of itemStorage ) this.arrEvt.push( new LocalEvent( eventJSON ) );
-        console.log('loaded from local storage');
+        // for( let eventJSON of itemStorage ) this.arrEvt.push( new LocalEvent( eventJSON ) );
 
-        // MARKERS
-        this.arrEvt.forEach(locEvt => {
-            this.createMarkers(locEvt);
+        // display markers created from Local Event stored in local storage
+        itemStorage.forEach(eventJSON => {
+            this.createMarkers(eventJSON);
         });
+
+        // create a new marker and popup from a Local Event
+        // this.arrEvt.forEach(locEvt => {
+        //     this.createMarkers(locEvt);
+        // });
     }
 
     /**
      * Create markers and popups
-     * @param {array element} locEvt 
      */
     createMarkers(locEvt) {
         // Popup
         const popUp = new mapboxgl.Popup({ closeOnMove: true, className: 'pop-up' });
-        // PopUp html 
         popUp.setHTML(this.popUpRender(locEvt));
-        popUp.closeOnMove(true);
 
-        // add pin 
+        // Marker
         let marker = new mapboxgl.Marker({
-            color: 'red'
-        }).setLngLat({ lon: locEvt.lon,lat: locEvt.lat,}).addTo(this.mainMap);
+            color: this.setMarkerColor(locEvt.beginDate)
+        }).setLngLat({ lon: locEvt.lon,lat: locEvt.lat,}).setPopup(popUp).addTo(this.mainMap);
 
         // title on mouse hover
         const markerDiv = marker.getElement();
@@ -110,7 +106,6 @@ class App {
 
     /**
      * Creation of Local Events
-     * @param {*} evt 
      */
     handlerCreateLocEvt(evt) {
         evt.preventDefault();
@@ -134,7 +129,7 @@ class App {
             }
         });
 
-        //TODO: send error message(then)
+        //TODO: send error message(try catch)
         if( hasError ) return;
         
         // Data treatment
@@ -150,25 +145,22 @@ class App {
         // add new event obj into array of Local Events
         this.arrEvt.push( new LocalEvent( newEvt ) );
         console.log(this.arrEvt);
-        console.log(newEvt);
 
         // Persistance des données
         this.evtStorage.setJSON( this.arrEvt );
-        console.log('added to local storage from event creation');
 
         //TODO: change alert for modal
         // success message
         alert(this.successMessage(newEvt.title));
 
+        document.dispatchEvent(new CustomEvent('displayMarker'));
+
         // clean input values after form submition
         this.form.clearInputs();
-
-        document.dispatchEvent(new CustomEvent('displayMarker'));
     }
 
     /**
      * PopUp HTML template
-     * @param {*} localEvt 
      */
     popUpRender(localEvt) {
         return `<h2>${localEvt.title}</h2>
@@ -181,39 +173,39 @@ class App {
 
     /**
      * Marker color according to Local Event date
-     * @param {*} eventDate 
-     * @returns string
      */
-    markerColorHandler(eventDate) {
+    setMarkerColor(eventDate) {
+        let msg = '';
+
         let today = new Date()
         let currDate = today.getTime();
         let parsedToday = parseInt(currDate);
         let parsedeventDate = parseInt(eventDate);
-        let daysNumber = 86400000 * 3;
-
-// evento em mais de tres dias 
-// evento em 3 dias ou menos
-// envento ja passado
+        let daysNumber = (60 * 60 * 24 * 1000) * 3;
 
         // console.log('today: ' + currDate);
         // console.log('evtDate: ' + Date.parse(eventDate));
-        // console.log('days: ' + (daysNumber));
+        // console.log('days: ' + daysNumber);
+        // console.log(typeof parsedToday);
+        // console.log(typeof daysNumber);
+        // console.log(typeof parsedeventDate);
+        let result = parsedToday - parsedeventDate;
+        // console.log(parsedToday - parsedeventDate);
+        // console.log(result);
 
-        // console.log(` result: ${parsedToday /  parsedeventDate}`);
-
-        if(parsedToday / parsedeventDate > daysNumber) {
+        if((parsedToday - daysNumber) < Date.parse(parsedeventDate)) {
             return '#69b53b';
-        } else if (parsedToday / parsedeventDate <= daysNumber && parsedToday - parsedeventDate == 0) {
+        } else if ((parsedToday - daysNumber <= Date.parse(parsedeventDate))  && (parsedToday - daysNumber == 0)) {
+            // msg = 'Attention, commence dans n jours et n heures';
             return '#f0d108';
-        } else if(parsedToday / parsedeventDate < 0) {
+        } else if(parsedToday > Date.parse(parsedeventDate)) {
+            // msg = 'Quel dommage ! Vous avez raté cet événement !'
             return '#cd470d';
         }
     }
 
     /**
      * Success message Html
-     * @param {*} title 
-     * @returns string
      */
     successMessage(title) {
         const msg = `The local Event ${title} was successfully created !`;
@@ -223,17 +215,14 @@ class App {
 
     /**
      * Error message Html
-     * @returns string
      */
     errorMessage() {
         const msg = `Please fill all fields`;
-
         return msg;
     }
     
     /**
      * Remove error class from inputs
-     * @param {evt.target} evt 
      */
     handlerRemoveError( evt ) {
         evt.target.classList.remove( 'error' );
@@ -241,7 +230,6 @@ class App {
 
     /**
      * Format Date to display in html
-     * @param {*} date 
      */
     formatDate(date) {
         return date.replace('T', ' ');
