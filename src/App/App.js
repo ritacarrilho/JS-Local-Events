@@ -1,8 +1,9 @@
-import config from '../../app.config';
+// import config from '../../app.config';
 import { LocalStorageService } from './Service/LocalStorageService';
 import { Form } from './Entity/Form';
 import { LocalEvent } from './Entity/LocalEvent';
-// import { Map } from './Entity/Map';
+import { Map } from './Entity/Map';
+import { Marker } from './Entity/Marker';
 
 
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -10,88 +11,65 @@ import mapboxgl, { Popup } from 'mapbox-gl';
 
 import '../../assets/styles/reset.css';
 import '../../assets/styles/style.css';
-import { DummyControl } from './Mapbox/Control/DummyControl';
 
 const STORAGE_KEY = 'local-events';
 
 class App {
     evtStorage = null;
     arrEvt = [];
-
-    form = null;
+   
     mainMap = null;
+    map = null;
     locEvent = null;
+    form = null;
+    formEls = null;
 
-    lat;
-    long;
     submitBtn;
 
     constructor() {
-        mapboxgl.accessToken = config.mapbox.token; // api token
+        // MAP initialize
+        this.map = new Map();
+        this.mainMap = this.map.mainMap;
+        //TODO: make Marker class
+        // this.marker = new Marker();
+        // this.pin = this.marker.
 
         this.form = new Form();
         this.evtStorage = new LocalStorageService( STORAGE_KEY );
-
-        // this.mainMap = new Map(); 
-        //TODO: make Map class
-
-        // MAP initialize
-        this.mainMap = new mapboxgl.Map({
-            container: 'main-map',
-            style: 'mapbox://styles/mapbox/dark-v10',
-        });
-
-        // Local Event initialize
-        // this.locEvent = new LocalEvent();
     }
 
     /**
      * Start App
      */
     start() {
+        // initialize map
+        this.map.start(this.form);
     // initialize form DOM
         this.form.getForm();
-        // this.mainMap.start();
-
-    // Set event listener - find coordinates from click and put it in input value
-        this.mainMap.on('click', (e) => {
-            console.log(e);
-            // console.log(this.latInput);
-            // console.log(this.lonInput);
-            this.form.lat.value = e.lngLat.lat;
-            this.form.lon.value = e.lngLat.lng;
-        });
-
-    // add navigation controls (zoom, inclinaison, etc)
-        const navControl = new mapboxgl.NavigationControl( {visualizePitch: true} );
-        this.mainMap.addControl(navControl, 'bottom-right');
-    
-    // add geolocation control
-        const geoControl = new mapboxgl.GeolocateControl({
-            fitBoundsOptions: {
-                zoom: 17.5,
-                padding: 20
-            },
-            positionOptions: {
-                enableHighAccuracy: true,
-                showUserHeading: true,
-            },
-        });
-
-        // Refresh button
-        this.mainMap.addControl(geoControl, 'top-right');
-
-        // Full Screen button
-        this.mainMap.addControl(new mapboxgl.FullscreenControl({body: document.querySelector('body')}));
-
-        // Add a personalized control "DummyControl"
-        const dummyControl = new DummyControl();
-        this.mainMap.addControl(dummyControl, 'top-right');
+  
+        //form elements
+        this.formEls = [ this.form.title, this.form.description, this.form.beginDate, this.form.endDate, this.form.lat, this.form.lon ];
 
         // Submit form event
         this.submitBtn = document.querySelector('#submit');
         this.submitBtn.addEventListener('click', this.handlerCreateLocEvt.bind(this));
 
+        this.getMarkers();
+
+        // personalized event
+        document.addEventListener("displayMarker", this.getMarkers.bind(this));
+
+        //remove error class on click
+        this.formEls.forEach(element => {
+            element.addEventListener( 'click', this.handlerRemoveError.bind(this) );
+        });
+
+    }
+
+    /**
+     * Display markers in map according to data in local storage
+     */
+    getMarkers() {
         // get data from local storage
         let itemStorage = this.evtStorage.getJSON();
 
@@ -100,47 +78,42 @@ class App {
 
         // store each local event into local storage
         for( let eventJSON of itemStorage ) this.arrEvt.push( new LocalEvent( eventJSON ) );
+        console.log('loaded from local storage');
 
-    // MARKERS
+        // MARKERS
         this.arrEvt.forEach(locEvt => {
-        // Popup
-        const popUp = new mapboxgl.Popup();
-        // PopUp html 
-        popUp.setHTML(this.popUpRender(locEvt));
-
-        // add pin 
-        const marker = new mapboxgl.Marker({
-            color: '#fc0'
-        }).setLngLat({
-                lon: locEvt.lon,
-                lat: locEvt.lat,
-            }).setPopup(popUp)
-                .addTo(this.mainMap);
-        });
-
-        // const markerTitle = marker.getElement();
-        // markerTitle.title = 'First Pin';
-
-        // all form inputs
-        let formEls = [ this.form.title, this.form.description, this.form.beginDate, this.form.endDate, this.form.lat, this.form.lon ];
-        //remove error class on click
-        formEls.forEach(element => {
-            element.addEventListener( 'click', this.handlerRemoveError.bind(this) );
+            this.createMarkers(locEvt);
         });
     }
-
 
     /**
-     * create HTML with data
-     * @param data {Object}
+     * Create markers and popups
+     * @param {array element} locEvt 
      */
-    render(data) {
+    createMarkers(locEvt) {
+        // Popup
+        const popUp = new mapboxgl.Popup({ closeOnMove: true, className: 'pop-up' });
+        // PopUp html 
+        popUp.setHTML(this.popUpRender(locEvt));
+        popUp.closeOnMove(true);
 
+        // add pin 
+        let marker = new mapboxgl.Marker({
+            color: 'red'
+        }).setLngLat({ lon: locEvt.lon,lat: locEvt.lat,}).addTo(this.mainMap);
+
+        // title on mouse hover
+        const markerDiv = marker.getElement();
+        markerDiv.title = `${locEvt.title} - from ${this.formatDate(locEvt.beginDate)} to ${this.formatDate(locEvt.endDate)}`;
+        // locEvt.title + ' - from ' + this.formatDate(locEvt.beginDate) + ' to ' + this.formatDate(locEvt.endDate);
     }
 
+    /**
+     * Creation of Local Events
+     * @param {*} evt 
+     */
     handlerCreateLocEvt(evt) {
         evt.preventDefault();
-        evt.addEventListener( 'change', this.form.lat.handlerRemoveError);
 
         let regAlphaNum = new RegExp('^[A-Za-z0-9 ]+$'),
             hasError = false;
@@ -152,32 +125,21 @@ class App {
             this.form.title.classList.add( 'error' );
         }
 
-        if( this.form.description.value == '' ||     
-            this.form.beginDate.value == '' ||
-            this.form.endDate.value == '' ||
-            this.form.lat.value == '' ||
-            this.form.lon.value == '') 
-        {
-            hasError = true;
-            this.form.description.value,     
-            this.form.beginDate.value,
-            this.form.endDate.value,
-            this.form.lat.value,
-            this.form.lon.value = '';
+        this.formEls.forEach(element => {
+            if( element.value == '') {
+                hasError = true;
+        
+                element.value = '';
+                element.classList.add('error');
+            }
+        });
 
-            this.form.description.classList.add( 'error' );
-            this.form.beginDate.classList.add( 'error' );
-            this.form.endDate.classList.add( 'error' );
-            this.form.lat.classList.add( 'error' );
-            this.form.lon.classList.add( 'error' );
-        }
-
-        //TODO: send error message(try, catch)
+        //TODO: send error message(then)
         if( hasError ) return;
         
         // Data treatment
         const newEvt = {};
-
+        // event obj properties creation
         newEvt.title = this.form.title.value;
         newEvt.description = this.form.description.value;
         newEvt.beginDate = this.form.beginDate.value;
@@ -188,9 +150,11 @@ class App {
         // add new event obj into array of Local Events
         this.arrEvt.push( new LocalEvent( newEvt ) );
         console.log(this.arrEvt);
- 
+        console.log(newEvt);
+
         // Persistance des données
         this.evtStorage.setJSON( this.arrEvt );
+        console.log('added to local storage from event creation');
 
         //TODO: change alert for modal
         // success message
@@ -198,42 +162,90 @@ class App {
 
         // clean input values after form submition
         this.form.clearInputs();
+
+        document.dispatchEvent(new CustomEvent('displayMarker'));
     }
 
-    // PopUp HTML template
+    /**
+     * PopUp HTML template
+     * @param {*} localEvt 
+     */
     popUpRender(localEvt) {
         return `<h2>${localEvt.title}</h2>
             <p><strong>Description: </strong>${localEvt.description}</p>
-            <p><strong>Begin Date: </strong>${localEvt.beginDate}</p>
-            <p><strong>End Date: </strong>${localEvt.endDate}</p>
+            <p><strong>Begin Date: </strong>${this.formatDate(localEvt.beginDate)}</p>
+            <p><strong>End Date: </strong>${this.formatDate(localEvt.endDate)}</p>
             <p><strong>Latitude: </strong>${localEvt.lat} lat</p>
             <p><strong>Longitude: </strong>${localEvt.lon} lon</p>`;
     }
 
+    /**
+     * Marker color according to Local Event date
+     * @param {*} eventDate 
+     * @returns string
+     */
     markerColorHandler(eventDate) {
-        let today = Date.now();
+        let today = new Date()
+        let currDate = today.getTime();
+        let parsedToday = parseInt(currDate);
+        let parsedeventDate = parseInt(eventDate);
+        let daysNumber = 86400000 * 3;
 
-        if (eventDate ) {
-           
+// evento em mais de tres dias 
+// evento em 3 dias ou menos
+// envento ja passado
+
+        // console.log('today: ' + currDate);
+        // console.log('evtDate: ' + Date.parse(eventDate));
+        // console.log('days: ' + (daysNumber));
+
+        // console.log(` result: ${parsedToday /  parsedeventDate}`);
+
+        if(parsedToday / parsedeventDate > daysNumber) {
+            return '#69b53b';
+        } else if (parsedToday / parsedeventDate <= daysNumber && parsedToday - parsedeventDate == 0) {
+            return '#f0d108';
+        } else if(parsedToday / parsedeventDate < 0) {
+            return '#cd470d';
         }
     }
 
+    /**
+     * Success message Html
+     * @param {*} title 
+     * @returns string
+     */
     successMessage(title) {
         const msg = `The local Event ${title} was successfully created !`;
 
         return msg;
     }
 
+    /**
+     * Error message Html
+     * @returns string
+     */
     errorMessage() {
         const msg = `Please fill all fields`;
 
         return msg;
     }
     
+    /**
+     * Remove error class from inputs
+     * @param {evt.target} evt 
+     */
     handlerRemoveError( evt ) {
         evt.target.classList.remove( 'error' );
     }
 
+    /**
+     * Format Date to display in html
+     * @param {*} date 
+     */
+    formatDate(date) {
+        return date.replace('T', ' ');
+    }
 }
 
 

@@ -1,8 +1,8 @@
 export class LocalEvent {
     title;
     description;
-    beginDate;
-    endDate;
+    beginDate = new Date();
+    endDate = new Date();
     lat;
     lon;
 

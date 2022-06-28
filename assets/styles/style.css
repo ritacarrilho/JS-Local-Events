@@ -152,7 +152,10 @@ body {
     justify-content: center;
 }
 
-
 .error {
     border-color: red;
+}
+
+.pop-up {
+    font-family: var(--main-font);
 }
