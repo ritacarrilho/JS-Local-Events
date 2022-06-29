@@ -2,6 +2,8 @@ import { LocalStorageService } from './Service/LocalStorageService';
 import { Form } from './Entity/Form';
 import { LocalEvent } from './Entity/LocalEvent';
 import { Map } from './Entity/Map';
+import { Modal } from './Entity/Modal';
+
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import mapboxgl from 'mapbox-gl';
@@ -22,11 +24,13 @@ class App {
     formEls = null;
 
     submitBtn;
+    modal;
 
     constructor() {
         // MAP initialize
         this.map = new Map();
         this.mainMap = this.map.mainMap;
+        this.modal = new Modal();
         //TODO: make Marker class
         // this.marker = new Marker();
         // this.pin = this.marker.
@@ -41,7 +45,7 @@ class App {
     start() {
         // initialize map
         this.map.start(this.form);
-    // initialize form DOM
+        // initialize form DOM
         this.form.getForm();
   
         //form elements
@@ -92,7 +96,9 @@ class App {
 
         // title on mouse hover
         const markerDiv = marker.getElement();
-        markerDiv.title = `${locEvt.title} - from ${this.formatDate(locEvt.beginDate)} to ${this.formatDate(locEvt.endDate)}`;
+        markerDiv.title = `${locEvt.title}
+from ${this.formatDate(locEvt.beginDate)} 
+to ${this.formatDate(locEvt.endDate)}`;
         // locEvt.title + ' - from ' + this.formatDate(locEvt.beginDate) + ' to ' + this.formatDate(locEvt.endDate);
     }
 
@@ -140,14 +146,16 @@ class App {
 
         // add new event obj into array of Local Events
         this.arrEvt.push( new LocalEvent( newEvt ) );
-
         this.evtStorage.setJSON(this.arrEvt);
 
-        //TODO: change alert for modal
-        // success message
-        alert(this.successMessage(newEvt.title));
+        // success modal
+        this.modal.render(this.form);
 
         document.dispatchEvent(new CustomEvent('displayMarker'));
+
+        // close modal
+        let closeBtn = document.querySelector('#message-close-btn');
+        closeBtn.addEventListener('click', this.handlerModal);
 
         // clean input values after form submition
         this.form.clearInputs();
@@ -158,11 +166,11 @@ class App {
      */
     popUpRender(localEvt) {
         return `<h2>${localEvt.title}</h2>
-            <p><strong>Description: </strong>${localEvt.description}</p>
-            <p><strong>Begin Date: </strong>${this.formatDate(localEvt.beginDate)}</p>
-            <p><strong>End Date: </strong>${this.formatDate(localEvt.endDate)}</p>
-            <p><strong>Latitude: </strong>${localEvt.lat} lat</p>
-            <p><strong>Longitude: </strong>${localEvt.lon} lon</p>`;
+            <p><span>Description: </span>${localEvt.description}</p>
+            <p><span>Begin Date: </span>${this.formatDate(localEvt.beginDate)}</p>
+            <p><span>End Date: </span>${this.formatDate(localEvt.endDate)}</p>
+            <p><span>Latitude: </span>${localEvt.lat} lat</p>
+            <p><span>Longitude: </span>${localEvt.lon} lon</p>`;
     }
 
     /**
@@ -199,15 +207,6 @@ class App {
     }
 
     /**
-     * Success message Html
-     */
-    successMessage(title) {
-        const msg = `The local Event ${title} was successfully created !`;
-
-        return msg;
-    }
-
-    /**
      * Error message Html
      */
     errorMessage() {
@@ -226,10 +225,17 @@ class App {
      * Format Date to display in html
      */
     formatDate(date) {
-        return date.replace('T', ' ');
+        return date.replace('T', ' at ');
+    }
+
+    /**
+     * Handler to close Modal
+     */
+    handlerModal() {
+        let modalDiv = document.querySelector('.success-message');
+        modalDiv.classList.add('hidden');
     }
 }
-
 
 const instance = new App();
 

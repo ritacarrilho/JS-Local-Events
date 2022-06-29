@@ -57,6 +57,8 @@ export class Map {
         // Full Screen button
         this.mainMap.addControl(new mapboxgl.FullscreenControl({body: document.querySelector('body')}));
 
+        this.mainMap.scrollZoom.setWheelZoomRate(1 / 100);
+
         // Add a personalized control "DummyControl"
         const dummyControl = new DummyControl();
         this.mainMap.addControl(dummyControl, 'top-right');

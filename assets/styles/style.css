@@ -12,6 +12,10 @@
     --box-shadow: #4c4c4c;
 }
 
+body {
+    position: relative;
+}
+
 /* --- Reusables --- */
 input, textarea {
     padding: 7px 5px;
@@ -106,7 +110,7 @@ body {
     left: 10px;
     top: 10px;
     text-align: center;
-    padding: 20px;
+    padding: 15px;
     box-shadow: 0 5px 15px var(--box-shadow);
     /* box-shadow: 0 0 2px rgb(0 0 0 / 20%), 0 -1px 0 rgb(0 0 0 / 2%); */
 }
@@ -156,6 +160,97 @@ body {
     border-color: red;
 }
 
-.pop-up {
+/* PopUp */
+.mapboxgl-popup-content {
+    border-radius: 7px;
     font-family: var(--main-font);
+    background-color: var(--main-bg-color);
+    padding: 20px;
+}
+
+    .mapboxgl-popup-content h2 {
+        padding-bottom: 15px;
+        font-weight: 400;
+
+    }
+
+    .mapboxgl-popup-content p {
+        padding-bottom: 2px;
+        font-weight: 300;
+    }
+
+        .mapboxgl-popup-content p span {
+            font-weight: 400;
+        }
+
+    .mapboxgl-popup-close-button{
+        margin: 10px;
+        font-size: 20px;
+    }
+
+/* Success Modal */
+.success-message {
+    align-items: center;
+    background-color: var(--main-bg-color);
+    position: fixed;
+    z-index: 10;
+    top: 30vh;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: 0 5px 15px var(--box-shadow);
+    border-radius: 7px;
+    padding: 80px 50px;
+    text-align: left;
+    width: 40%;
+    margin-left: 30%;
+    min-height: 350px;
+    justify-content: space-around;
+}
+    .success-message > span, 
+    .modal-info{
+        text-align: center;
+    }
+        .success-message > span p{
+            font-size: 20px;
+        }
+
+    .modal-info {
+        padding-top: 5px;
+        font-weight: 300;
+    }
+
+        .modal-info > h5 {
+            font-size: 17px;
+            font-weight: 400;
+            padding-bottom: 5px;
+        }
+
+        .modal-info p span {
+            font-weight: 400;
+        }
+
+    .success-message > .btn-close {
+        padding: 5px;
+        width: 85px;
+        background-color: var(--dark-grey);
+        border-radius: 12px;
+        border: 0;
+        /* box-sizing: border-box; */
+        color: var(--letters);
+        cursor: pointer;
+        font-size: 14px;
+        /* height: 45px; */
+        margin-top: 17px;
+        text-align: center;
+    }
+        .btn-close:hover {
+            color: var(--dark-grey);
+            background-color: var(--letters);
+            border: 1px solid var(--medium-grey);
+    }
+
+/* Generic class */
+.hidden {
+display: none;
 }

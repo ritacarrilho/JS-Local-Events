@@ -22,20 +22,20 @@
         <div class="side-panel-caption">
             <div class="side-panel-info">
                 <i class="fa-solid fa-location-dot"></i>
-                <p>Événement dans plus de 3 jours</p>
+                <p>Event in more than 3 days</p>
             </div>
             <div class="side-panel-info">
                 <i class="fa-solid fa-location-dot"></i>
-                <p>Événement dans 3 jours ou moins</p>
+                <p>Event in 3 days or less</p>
             </div>           
             <div class="side-panel-info">
                 <i class="fa-solid fa-location-dot"></i>
-                <p>Événement dépassé</p>
+                <p>Event exceeded</p>
             </div>
 
         </div>
-    </div> 
-    
+    </div>
 
+    <div class="success-message hidden"></div>
 </body>
 </html>
