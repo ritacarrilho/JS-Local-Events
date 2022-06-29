@@ -43,7 +43,6 @@ export class DummyControl {
      * 
      */
     handlerDummyClick() {
-        //TODO: make refresh functionalities
-        console.log(this.container.textContent);
+        window.location.reload();
     }
 }

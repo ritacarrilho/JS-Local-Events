@@ -91,7 +91,7 @@ class App {
 
         // Marker
         let marker = new mapboxgl.Marker({
-            color: this.setMarkerColor(locEvt.beginDate)
+            color: this.setMarkerColor(locEvt)
         }).setLngLat({ lon: locEvt.lon,lat: locEvt.lat,}).setPopup(popUp).addTo(this.mainMap);
 
         // title on mouse hover
@@ -170,40 +170,55 @@ to ${this.formatDate(locEvt.endDate)}`;
             <p><span>Begin Date: </span>${this.formatDate(localEvt.beginDate)}</p>
             <p><span>End Date: </span>${this.formatDate(localEvt.endDate)}</p>
             <p><span>Latitude: </span>${localEvt.lat} lat</p>
-            <p><span>Longitude: </span>${localEvt.lon} lon</p>`;
+            <p><span>Longitude: </span>${localEvt.lon} lon</p>
+            <p>${this.setDaysMessage(localEvt)}</p>`;
     }
 
     /**
      * Marker color according to Local Event date
      */
-    setMarkerColor(eventDate) {
-        let msg = '';
+    setMarkerColor(date) {
+        let threeDays = new Date(date.beginDate).getTime() - ( 3 * 24 * 60 * 60 * 1000 );
+        let currDate = Date.now();
+        let dateEnd = new Date(date.endDate).getTime();
 
-        let today = new Date()
-        let currDate = today.getTime();
-        let parsedToday = parseInt(currDate);
-        let parsedeventDate = parseInt(eventDate);
-        let daysNumber = (60 * 60 * 24 * 1000) * 3;
-
-        // console.log('today: ' + currDate);
-        // console.log('evtDate: ' + Date.parse(eventDate));
-        // console.log('days: ' + daysNumber);
-        // console.log(typeof parsedToday);
-        // console.log(typeof daysNumber);
-        // console.log(typeof parsedeventDate);
-        let result = parsedToday - parsedeventDate;
-        // console.log(parsedToday - parsedeventDate);
-        // console.log(result);
-
-        if((parsedToday - daysNumber) < Date.parse(parsedeventDate)) {
-            return '#69b53b';
-        } else if ((parsedToday - daysNumber <= Date.parse(parsedeventDate))  && (parsedToday - daysNumber == 0)) {
-            // msg = 'Attention, commence dans n jours et n heures';
-            return '#f0d108';
-        } else if(parsedToday > Date.parse(parsedeventDate)) {
-            // msg = 'Quel dommage ! Vous avez raté cet événement !'
-            return '#cd470d';
+        if (currDate < threeDays) { // green
+            return '#91CC5A'
         }
+        else if (dateEnd < currDate){ //red
+            return '#CC5959'
+        }
+        else { // orange
+            return '#D49C42';
+        }
+    }
+
+    /**
+     * display message according to Local Event date
+     */
+    setDaysMessage(date) {
+        let currDate = Date.now();
+        let evtBegDate = new Date(date.beginDate).getTime();
+        let evtEndDate = new Date(date.endDate).getTime();
+        let threeDays =  3 * 24 * 60 * 60 * 1000 ;
+
+        let dateResult = evtBegDate - currDate;
+
+        if(dateResult <= threeDays && evtEndDate >= currDate) {
+            return `Attention, this event starts in ${new Date(dateResult / 1000 / 24 / 60 / 60 ).getTime()} days and ${new Date(dateResult / 1000 / 24 / 60 / 60).getTime()} hours`;
+        } else if(evtBegDate - currDate < threeDays) {
+            return 'What a pity ! You missed this event!';
+        } else if(evtBegDate - currDate > threeDays) {
+            return '';
+        }
+
+        // if(evtBegDate - currDate > threeDays ) {
+        //     return `Attention, this event starts in ${evtBegDate} days and ${evtEndDate} hours`;
+        // } else if(evtBegDate - currDate < threeDays) {
+        //     return 'What a pity ! You missed this event!';
+        // } else if(currDate - evtBegDate <= threeDays && evtEndDate > currDate) {
+        //     return 'You missed the beggining of this event but you can still attend!';
+        // }
     }
 
     /**
