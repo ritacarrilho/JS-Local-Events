@@ -12,7 +12,7 @@ import '../../assets/styles/style.css';
 const STORAGE_KEY = 'local-events';
 
 class App {
-    evtStorage = null;
+    evtStorage = [];
     arrEvt = [];
    
     mainMap = null;
@@ -70,19 +70,11 @@ class App {
         let itemStorage = this.evtStorage.getJSON();
         // If the local storage is not yet created, ends method execution
         if( itemStorage === null ) return;
-        // console.log(this.arrEvt);
-
-        // for( let eventJSON of itemStorage ) this.arrEvt.push( new LocalEvent( eventJSON ) );
 
         // display markers created from Local Event stored in local storage
         itemStorage.forEach(eventJSON => {
             this.createMarkers(eventJSON);
         });
-
-        // create a new marker and popup from a Local Event
-        // this.arrEvt.forEach(locEvt => {
-        //     this.createMarkers(locEvt);
-        // });
     }
 
     /**
@@ -142,12 +134,14 @@ class App {
         newEvt.lat = this.form.lat.value;
         newEvt.lon = this.form.lon.value;
 
+        // if local storage is empty, array of local events is eqaul to an empty array, otherwise it gets the value of the local storage
+        this.evtStorage.getJSON() === null ? this.arrEvt = [] : this.arrEvt = this.evtStorage.getJSON();
+        // console.log(this.arrEvt);
+
         // add new event obj into array of Local Events
         this.arrEvt.push( new LocalEvent( newEvt ) );
-        console.log(this.arrEvt);
 
-        // Persistance des données
-        this.evtStorage.setJSON( this.arrEvt );
+        this.evtStorage.setJSON(this.arrEvt);
 
         //TODO: change alert for modal
         // success message

@@ -29,7 +29,6 @@ export class LocalStorageService {
             return JSON.parse(this.get());
         }
         catch(e) {
-            // if the data is not good, clears from local storage
             this.clear();
             return null;
         }
