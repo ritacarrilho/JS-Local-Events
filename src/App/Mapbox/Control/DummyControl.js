@@ -1,6 +1,7 @@
 export class DummyControl {
     map;
     container; 
+    
     /**
      * 
      * @param map {Object}

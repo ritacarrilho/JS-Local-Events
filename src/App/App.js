@@ -169,8 +169,8 @@ to ${this.formatDate(locEvt.endDate)}`;
             <p><span>Description: </span>${localEvt.description}</p>
             <p><span>Begin Date: </span>${this.formatDate(localEvt.beginDate)}</p>
             <p><span>End Date: </span>${this.formatDate(localEvt.endDate)}</p>
-            <p><span>Latitude: </span>${localEvt.lat} lat</p>
-            <p><span>Longitude: </span>${localEvt.lon} lon</p>
+            <p><span>Latitude: </span>${localEvt.lat}</p>
+            <p><span>Longitude: </span>${localEvt.lon}</p>
             <p>${this.setDaysMessage(localEvt)}</p>`;
     }
 
@@ -202,23 +202,22 @@ to ${this.formatDate(locEvt.endDate)}`;
         let evtEndDate = new Date(date.endDate).getTime();
         let threeDays =  3 * 24 * 60 * 60 * 1000 ;
 
-        let dateResult = evtBegDate - currDate;
+        const dateResult = evtBegDate - currDate;
+        const days = Math.floor(dateResult / (24*60*60*1000));
+        const daysMs = dateResult % (24*60*60*1000);
+        const hours = Math.floor(daysMs / (60*60*1000));
+        const hoursMs = dateResult % (60*60*1000);
+        const minutes = Math.floor(hoursMs / (60*1000));
 
         if(dateResult <= threeDays && evtEndDate >= currDate) {
-            return `Attention, this event starts in ${new Date(dateResult / 1000 / 24 / 60 / 60 ).getTime()} days and ${new Date(dateResult / 1000 / 24 / 60 / 60).getTime()} hours`;
+            return `<p style= "color: #D49C42; font-weight: 400;">Attention, this event starts in ${days} days, ${hours} hours and ${minutes} minutes</p>`;
         } else if(evtBegDate - currDate < threeDays) {
-            return 'What a pity ! You missed this event!';
+            return '<p style= "color: #CC5959; font-weight: 400;">What a pity ! You missed this event !</p>';
         } else if(evtBegDate - currDate > threeDays) {
-            return '';
-        }
+            return `<p style= "color: #91CC5A; font-weight: 400;">Attention, this event starts in ${days} days, ${hours} hours and ${minutes} minutes</p>`;
+            // return '';
 
-        // if(evtBegDate - currDate > threeDays ) {
-        //     return `Attention, this event starts in ${evtBegDate} days and ${evtEndDate} hours`;
-        // } else if(evtBegDate - currDate < threeDays) {
-        //     return 'What a pity ! You missed this event!';
-        // } else if(currDate - evtBegDate <= threeDays && evtEndDate > currDate) {
-        //     return 'You missed the beggining of this event but you can still attend!';
-        // }
+        }
     }
 
     /**
