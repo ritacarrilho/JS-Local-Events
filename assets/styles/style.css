@@ -101,16 +101,23 @@ body {
                     border: 1px solid var(--medium-grey);
                 }
 
+/* --- Search bar --- */
+.mapboxgl-ctrl-geocoder {
+    border-radius: 10px;
+    border: 1px solid var(--medium-grey);
+    box-shadow: 0 5px 15px var(--box-shadow);
+}
+
 /* --- Events caption --- */
 .events-caption {
     background-color: var(--main-bg-color);
-    /* width: 250px; */
+    width: 239px;
     border-radius: 15px;
     position: fixed;
     left: 10px;
-    top: 10px;
+    top: 64px;
     text-align: center;
-    padding: 15px;
+    padding: 20px;
     box-shadow: 0 5px 15px var(--box-shadow);
     /* box-shadow: 0 0 2px rgb(0 0 0 / 20%), 0 -1px 0 rgb(0 0 0 / 2%); */
 }
@@ -248,6 +255,23 @@ body {
             color: var(--dark-grey);
             background-color: var(--letters);
             border: 1px solid var(--medium-grey);
+    }
+/* --- change map style Menu*/
+#menu {
+    position: absolute;
+    background: #efefef;
+    padding: 12px 0px 12px 17px;
+    font-family: 'Open Sans', sans-serif;
+    bottom: 15px;
+    left: 5px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px var(--box-shadow);
+}
+
+    #menu label {
+        padding-right: 17px;
+        font-family: var(--main-font);
+        font-weight: 300;
     }
 
 /* Generic class */

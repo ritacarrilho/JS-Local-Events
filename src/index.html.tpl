@@ -40,5 +40,19 @@
     </div>
 
     <div class="success-message hidden"></div>
+
+    <div id="menu">
+        <input id="dark-v10" class="menu-input" type="radio" name="rtoggle" value="dark" checked="checked">
+        <label for="dark-v10">Dark</label>
+        <input id="light-v10" class="menu-input" type="radio" name="rtoggle" value="light">
+        <label for="light-v10">Light</label>
+        <input id="satellite-v9" class="menu-input" type="radio" name="rtoggle" value="satellite">
+        <label for="satellite-v9">Satellite</label>
+        <input id="streets-v11" class="menu-input" type="radio" name="rtoggle" value="streets">
+        <label for="streets-v11">Streets</label>
+        <input id="outdoors-v11" class="menu-input" type="radio" name="rtoggle" value="outdoors">
+        <label for="outdoors-v11">Outdoors</label>
+    </div>
+
 </body>
 </html>
