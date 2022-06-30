@@ -156,46 +156,7 @@ body {
             color: #CC5959;
         }
 
-.map-control-clown {
-    align-items: center;
-    display: flex;
-    font-size: 20px;
-    justify-content: center;
-}
-
-.error {
-    border-color: red;
-}
-
-/* PopUp */
-.mapboxgl-popup-content {
-    border-radius: 7px;
-    font-family: var(--main-font);
-    background-color: var(--main-bg-color);
-    padding: 20px;
-}
-
-    .mapboxgl-popup-content h2 {
-        padding-bottom: 15px;
-        font-weight: 400;
-        font-size: 22px;
-    }
-
-    .mapboxgl-popup-content p {
-        padding-bottom: 2px;
-        font-weight: 300;
-    }
-
-        .mapboxgl-popup-content p span {
-            font-weight: 400;
-        }
-
-    .mapboxgl-popup-close-button{
-        margin: 10px;
-        font-size: 20px;
-    }
-
-/* Success Modal */
+/* --- Success Modal --- */
 .success-message {
     align-items: center;
     background-color: var(--main-bg-color);
@@ -255,8 +216,9 @@ body {
             color: var(--dark-grey);
             background-color: var(--letters);
             border: 1px solid var(--medium-grey);
-    }
-/* --- change map style Menu*/
+        }  
+
+/* --- Change map style --- */
 #menu {
     position: absolute;
     background: #efefef;
@@ -300,8 +262,47 @@ body {
         border: 1px solid var(--medium-grey);
     }
 
+/* --- Refresh Button --- */
+.map-control-clown {
+    align-items: center;
+    display: flex;
+    font-size: 20px;
+    justify-content: center;
+}
+
+/* PopUp */
+.mapboxgl-popup-content {
+    border-radius: 7px;
+    font-family: var(--main-font);
+    background-color: var(--main-bg-color);
+    padding: 20px;
+}
+
+    .mapboxgl-popup-content h2 {
+        padding-bottom: 15px;
+        font-weight: 400;
+        font-size: 22px;
+    }
+
+    .mapboxgl-popup-content p {
+        padding-bottom: 2px;
+        font-weight: 300;
+    }
+
+        .mapboxgl-popup-content p span {
+            font-weight: 400;
+        }
+
+    .mapboxgl-popup-close-button{
+        margin: 10px;
+        font-size: 20px;
+    }
+
 /* Generic class */
+.error {
+    border-color: red;
+}
+
 .hidden {
 display: none;
 }
-
