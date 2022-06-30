@@ -202,22 +202,32 @@ to ${this.formatDate(locEvt.endDate)}`;
         let evtEndDate = new Date(date.endDate).getTime();
         let threeDays =  3 * 24 * 60 * 60 * 1000 ;
 
-        const dateResult = evtBegDate - currDate;
+        const dateResult = this.formatMessageTime(evtBegDate, currDate);
+        const passedDateResult = this.formatMessageTime(evtEndDate, currDate);
+
+        if(evtBegDate < currDate && evtEndDate > currDate) { 
+            return `<p style= "color: #D49C42; font-weight: 400;">Attention, this event ends in ${passedDateResult[0]} days, ${passedDateResult[1]} hours and ${passedDateResult[2]} minutes</p>`;
+        } else if(evtBegDate - currDate <= threeDays && evtBegDate > currDate) {
+            return `<p style= "color: #D49C42; font-weight: 400;">Attention, this event starts in ${dateResult[0]} days, ${dateResult[1]} hours and ${dateResult[2]} minutes</p>`;
+        }else if(evtBegDate < currDate && evtEndDate < currDate) {
+            return '<p style= "color: #CC5959; font-weight: 400;">What a pity ! You missed this event !</p>';
+        } else if(evtBegDate - currDate > threeDays) {
+            return `<p style= "color: #91CC5A; font-weight: 400;">Attention, this event starts in ${dateResult[0]} days, ${dateResult[1]} hours and ${dateResult[2]} minutes</p>`;
+            // return '';
+        }
+    }
+
+    formatMessageTime(date1, date2) {
+        const dateResult = date1 - date2;
+
         const days = Math.floor(dateResult / (24*60*60*1000));
         const daysMs = dateResult % (24*60*60*1000);
         const hours = Math.floor(daysMs / (60*60*1000));
         const hoursMs = dateResult % (60*60*1000);
         const minutes = Math.floor(hoursMs / (60*1000));
 
-        if(dateResult <= threeDays && evtEndDate >= currDate) {
-            return `<p style= "color: #D49C42; font-weight: 400;">Attention, this event starts in ${days} days, ${hours} hours and ${minutes} minutes</p>`;
-        } else if(evtBegDate - currDate < threeDays) {
-            return '<p style= "color: #CC5959; font-weight: 400;">What a pity ! You missed this event !</p>';
-        } else if(evtBegDate - currDate > threeDays) {
-            return `<p style= "color: #91CC5A; font-weight: 400;">Attention, this event starts in ${days} days, ${hours} hours and ${minutes} minutes</p>`;
-            // return '';
-
-        }
+        const time = [ days, hours, minutes ];
+        return time;
     }
 
     /**

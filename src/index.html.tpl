@@ -39,7 +39,7 @@
         </div>
     </div>
 
-    <button id="zoom">Zoom to buildings</button>
+    <button id="zoom">Zoom In</button>
 
     <div class="success-message hidden"></div>
 
