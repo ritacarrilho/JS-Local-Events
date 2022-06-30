@@ -274,7 +274,34 @@ body {
         font-weight: 300;
     }
 
+/* --- Zoom Btn --- */
+#zoom {
+    display: block;
+    position: fixed;
+    width: 132px;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    font-size: 12px;
+    text-align: center;
+    color: var(--dark-grey);
+    background: var(--main-bg-color);
+    top: 12px;
+    left: 38%;
+    font-family: var(--main-font);
+    font-weight: 300;
+    box-shadow: 0 5px 15px var(--box-shadow);
+}
+
+    #zoom:hover {
+        color: var(--dark-grey);
+        cursor: pointer;
+        background-color: var(--letters);
+        border: 1px solid var(--medium-grey);
+    }
+
 /* Generic class */
 .hidden {
 display: none;
 }
+

@@ -13,6 +13,7 @@ export class Map {
     mainMap = null;
     lat = null;
     long = null;
+    zoomBtn = document.getElementById('zoom');
     
     constructor() {
         mapboxgl.accessToken = config.mapbox.token; // api token
@@ -42,11 +43,44 @@ export class Map {
             form.lon.classList.remove('error');
         });
 
-        // add navigation controls (zoom, inclinaison, etc)
+        // Change buildings color when zoom
+        this.mainMap.on('load', () => {
+            this.mainMap.setPaintProperty('building', 'fill-color', [
+                'interpolate',
+                // Set the exponential rate of change to 0.5
+                ['exponential', 0.9],
+                ['zoom'],
+                // When zoom is 15, buildings will be beige.
+                12,
+                '#b8b7b6',
+                // When zoom is 18 or higher, buildings will be white.
+                18,
+                '#000000'
+            ]);
+             
+            this.mainMap.setPaintProperty('building', 'fill-opacity', [
+                'interpolate',
+                // Set the exponential rate of change to 0.5
+                ['exponential', 0.9],
+                ['zoom'],
+                // When zoom is 10, buildings will be 100% transparent.
+                10,
+                0,
+                // When zoom is 18 or higher, buildings will be 100% opaque.
+                18,
+                1
+            ]);
+        });
+
+        // When the button is clicked, zoom in to zoom level 19.
+        // The animation duration is 9000 milliseconds.
+        this.zoomBtn.addEventListener('click', this.zoomInHandler.bind(this));
+
+        // Navigation controls (zoom, inclinaison, etc)
         const navControl = new mapboxgl.NavigationControl( {visualizePitch: true} );
         this.mainMap.addControl(navControl, 'bottom-right');
     
-        // add geolocation control
+        // Geolocation control
         const geoControl = new mapboxgl.GeolocateControl({
             fitBoundsOptions: {
                 zoom: 15,
@@ -58,20 +92,20 @@ export class Map {
             },
         });
 
-        // Refresh button
+        // Refresh button control
         this.mainMap.addControl(geoControl, 'top-right');
 
-        // Full Screen button
+        // Full Screen button control
         this.mainMap.addControl(new mapboxgl.FullscreenControl({body: document.querySelector('body')}));
 
         // Adjust map scroll
         this.mainMap.scrollZoom.setWheelZoomRate(1 / 100);
 
-        // Personalized control "DummyControl"
+        // Personalized "DummyControl" control
         const dummyControl = new DummyControl();
         this.mainMap.addControl(dummyControl, 'top-right');
 
-        // Search bar
+        // Search bar control
         this.mainMap.addControl(new MapboxGeocoder({
             accessToken: mapboxgl.accessToken, 
             mapboxgl: mapboxgl,
@@ -94,6 +128,10 @@ export class Map {
             
     }
 
+    zoomInHandler() {
+        this.mainMap.zoomTo(18, { duration: 10000 });
+        // this.zoomBtn.innerHTML = 'Remove Color';
+    }
 }
 
 

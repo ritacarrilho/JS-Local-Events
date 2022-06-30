@@ -39,6 +39,8 @@
         </div>
     </div>
 
+    <button id="zoom">Zoom to buildings</button>
+
     <div class="success-message hidden"></div>
 
     <div id="menu">
