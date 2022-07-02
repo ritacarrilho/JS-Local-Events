@@ -38,6 +38,7 @@ The pin of the event is different depending on the date:
 * An update information button in the form of a Mapbox custom control will be available at the left of the map.
 * Zoom in and zoom out buttons avaulable at the bottom right of the map
 * Search bar added to the top right to search places by address, city or country
+* Radio buttons to select a map style 
 
 ### Data storage:
 The data will be saved in the Local Storage. When starting the application the already saved data should appear on the map.
