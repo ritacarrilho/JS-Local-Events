@@ -6,7 +6,7 @@ export class Modal {
 
     render(data) {
         this.modalDiv.innerHTML = `<span>
-            <p>The Event ${data.title.value} as been successfully added</p>
+            <p>The Event "${data.title.value}" as been successfully added</p>
         </span>
 
         <div class="modal-info">

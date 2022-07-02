@@ -85,7 +85,6 @@ export class Form {
             <button type="submit" id="submit" class="btn btn-dark mt-3">Create</button>`;
 
             //form.classList.add('m-3'); give padding to form 
-        // TODO: legenda de eventos (cores de pins)
             sidePanel.appendChild(form);
             this.beginDate = document.querySelector('#begin');
             this.endDate = document.querySelector('#end');

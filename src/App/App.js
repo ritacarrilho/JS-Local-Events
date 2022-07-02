@@ -32,8 +32,6 @@ class App {
         this.mainMap = this.map.mainMap;
         this.modal = new Modal();
         //TODO: make Marker class
-        // this.marker = new Marker();
-        // this.pin = this.marker.
 
         this.form = new Form();
         this.evtStorage = new LocalStorageService( STORAGE_KEY );
@@ -127,7 +125,6 @@ to ${this.formatDate(locEvt.endDate)}`;
             }
         });
 
-        //TODO: send error message(try catch)
         if( hasError ) return;
         
         // Data treatment
