@@ -51,7 +51,7 @@ In the Popup, in addition to other information, a message should be displayed de
 *Event expired: “What a pity! You missed this event!”.
 
 ## Features 
-* When clicking on the map, the <input> of the coordinates are fed
+* When clicking on the map, the inputs of coordinates are fed
 * Events are displayed on the map in the form of Markers
 * When hovering the mouse over a Marker we see the title and the dates of the event
 * A Popup linked to each Marker displays all the information about the event
